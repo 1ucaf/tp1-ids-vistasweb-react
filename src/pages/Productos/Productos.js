@@ -1,8 +1,9 @@
 import Alert from '@material-ui/lab/Alert'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
-import { rootPath } from '../../App'
-import Table from '../../components/Table/Table'
+import { rootApiPath, rootPath } from '../../App'
+import Table from '../../components/Table/Table';
+import axios from 'axios';
 
 const containerStyles = {
     padding: "40px",
@@ -12,23 +13,23 @@ const containerStyles = {
     backgroundColor: "rgba(255, 255, 255, 0.8)"
 }
 
-const data = [
-    {
-        id: "1",
-        description: "Zapatilla Nike",
-        price: "$ 10000",
-    },
-    {
-        id: "2",
-        description: "Campera Adidas",
-        price: "$ 6000",
-    },
-    {
-        id: "3",
-        description: "Camisa Polo",
-        price: "$ 5000",
-    },
-    ]
+// const data = [
+//     {
+//         id: "1",
+//         description: "Zapatilla Nike",
+//         price: "$ 10000",
+//     },
+//     {
+//         id: "2",
+//         description: "Campera Adidas",
+//         price: "$ 6000",
+//     },
+//     {
+//         id: "3",
+//         description: "Camisa Polo",
+//         price: "$ 5000",
+//     },
+// ]
 const columns = [
     {
         key: "id",
@@ -41,19 +42,40 @@ const columns = [
     {
         key: "price",
         text: "Precio",
+    },
+    {
+        key: "marca",
+        text: "Marca",
     }
 ]
 
 
 const Productos = () => {
     let history = useHistory();
+    const [data, setData] = useState();
     const [selectedProductId, setSelectedProductId] = useState();
     const [errorMessage, setErrorMessage] = useState();
     const selectHandler = (id) => {
         console.log(id);
         setSelectedProductId(id);
     }
-    
+
+    useEffect(()=>{
+        axios.get(rootApiPath + "productos/lista")
+        .then((response)=>{
+            console.log("productos que llegan de la api: ",response.data);
+            const arrayAux = response.data.map((producto)=>{
+                return {
+                    id: producto.CodigoDeBarra,
+                    description: producto.Descripcion,
+                    price: producto.PrecioVenta,
+                    marca: producto.Marca.Descripcion,
+                }
+            })
+            setData([...arrayAux]);
+        })
+    }, [])
+
     const editarProducto = (e)=>{
         e.preventDefault();
         if(selectedProductId)

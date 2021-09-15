@@ -16,7 +16,7 @@ import Usuarios from './pages/Usuarios/Usuarios';
 
 
 export const rootPath = "";
-export const rootApiPath = "http://localhost:4343";
+export const rootApiPath = "http://localhost:64555/";
 
 
 const routes = [

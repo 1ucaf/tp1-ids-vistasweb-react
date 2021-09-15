@@ -1,5 +1,7 @@
-import React, { useState } from 'react'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { rootApiPath } from '../../App';
 
 const AltaProducto = (props) => {
     let {idProducto} = useParams("1");
@@ -9,6 +11,11 @@ const AltaProducto = (props) => {
     const [netoGravado, setNetoGravado] = useState();
     const [IVA, setIVA] = useState();
     const [precioFinalVenta, setPrecioFinalVenta] = useState();
+    const [selectedRubroId, setSelectedRubroId] = useState("");
+    const [selectedMarcaId, setSelectedMarcaId] = useState("");
+    const [rubros, setRubros] = useState([]);
+    const [marcas, setMarcas] = useState([]);
+    
     const containerStyles = {
         padding: "40px",
         borderRadius: "25px",
@@ -16,6 +23,35 @@ const AltaProducto = (props) => {
         maxWidth: "90%",
         backgroundColor: "rgba(255, 255, 255, 0.8)"
     }
+    
+    useEffect(()=>{
+        axios.get(rootApiPath + "productos/?id="+idProducto)
+        .then((response)=>{
+            console.log("producto: ",response.data);
+            setDescripción(response.data.Descripcion);
+            setCosto(response.data.Costo);
+            setMargenDeGanancia(response.data.MargenDeGanancia);
+            setNetoGravado(response.data.NetoGravado);
+            setIVA(response.data.IVA);
+            setPrecioFinalVenta(response.data.PrecioVenta);
+            setSelectedMarcaId(response.data.Marca.Id);
+            setSelectedRubroId(response.data.Rubro.Id);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+        axios.get(rootApiPath + "rubros/lista")
+        .then(response=> {
+            console.log(response.data);
+            setRubros(response.data);
+        })
+        axios.get(rootApiPath + "marcas/lista")
+        .then(response=> {
+            console.log(response.data);
+            setMarcas(response.data);
+        })
+        
+    }, [])
     return (
         <div style={containerStyles}>
             {props.isNew?(
@@ -37,19 +73,25 @@ const AltaProducto = (props) => {
             <input type="text" id="idProducto" className="form-control" value={margenDeGanancia} onChange={(e)=>{setMargenDeGanancia(e.target.value)}}/>
             
             <label htmlFor="idProducto"> Rubro </label>
-            <select class="form-select" aria-label="Default select example">
-                <option selected>Calzados Deportivos</option>
-                <option value="1">Prendas de Vestir</option>
-                <option value="2">Urbano</option>
-                <option value="3">Camisas</option>
+            <select /* defaultValue={selectedRubroId} */ value={selectedRubroId} class="form-select" aria-label="Default select example">
+                {
+                    rubros.map(rubro => {
+                        return (
+                            <option value={rubro.Id}>{rubro.Descripcion}</option>
+                        )
+                    })
+                }
             </select>
 
             <label htmlFor="idProducto"> Marca </label>
-            <select class="form-select" aria-label="Default select example">
-                <option selected>Adidas</option>
-                <option value="1">Nike</option>
-                <option value="2">Le Coq</option>
-                <option value="3">Puma</option>
+            <select /* defaultValue={selectedMarcaId} */ value={selectedMarcaId} class="form-select" aria-label="Default select example">
+                {
+                    marcas.map(marca => {
+                        return (
+                            <option value={marca.Id}>{marca.Descripcion}</option>
+                        )
+                    })
+                }
             </select>
 
             <label htmlFor="idProducto"> Neto Gravado </label>

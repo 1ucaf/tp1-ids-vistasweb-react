@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from './Header';
 import Row from './Row';
 
@@ -41,15 +41,20 @@ export default function Table(props) {
         });
     }
 
-    const [arrayForStoreSelectedRow, setArrayForStoreSelectedRow] = useState(props.data?.map(()=> false));
+    const [arrayForStoreSelectedRow, setArrayForStoreSelectedRow] = useState();
+    useEffect(()=>{
+        setArrayForStoreSelectedRow(props.data?.map(()=> false));
+    },[props.data])
     const selectRow = (e)=>{
         if(props.isSelectTable) {
             var index = e.target.parentElement.id[e.target.parentElement.id.length - 1];    //El STRING "id" está formado por muchas cosas, entre ellas, el número que la fila ocupa dentro de la tabla. Dicho número se encuentra al final del string, por lo que con esta línea estoy pudiendo acceder al index de la fila seleccionada.
                                                                                             //EJEMPLO: si el id de la fila es: "tableIdrow7" (id="tableIdrow7"), entonces id[id.length - 1] será 7, que es el número al que quiero acceder.
             props.selectCallBack(props.data[index][props.idColumn]);
-            var aux = arrayForStoreSelectedRow.map(()=> false);
-            aux[index]=true;
-            setArrayForStoreSelectedRow([...aux]);
+            var aux = arrayForStoreSelectedRow?.map(()=> false);
+            if(aux) {
+                aux[index]=true;
+                setArrayForStoreSelectedRow([...aux]);
+            }
         }
     }
 
